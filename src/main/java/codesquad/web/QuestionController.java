@@ -15,9 +15,8 @@ public class QuestionController {
     private List<Question> questions = new ArrayList<>();
 
     @PostMapping("/questions")
-    public String create(Model model, Question question) {
+    public String create(Question question) {
         questions.add(question);
-        model.addAttribute("questions", questions);
         return "redirect:/";
     }
 

@@ -47,9 +47,7 @@ public class UserController {
     public String update(@PathVariable int id,
                          User user) {
         User savedUser = users.get(id);
-        if(!user.matchPassword(savedUser))
-            throw new IllegalArgumentException("You can't edit your information because your passwords do not match.");
-        users.set(id, user);
+        savedUser.update(user);
         return "redirect:/users";
     }
 }
