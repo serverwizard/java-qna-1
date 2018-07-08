@@ -1,12 +1,22 @@
 package codesquad.domain;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Entity
 public class Question {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column
     private String writer;
+    @Column
     private String title;
+    @Column
     private String contents;
+    @Column
     private String enrollTime;
 
     public Question(String writer, String title, String contents) {
