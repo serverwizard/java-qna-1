@@ -1,7 +1,8 @@
 package codesquad.web;
 
 import codesquad.domain.User;
-import codesquad.repository.UserRepository;
+import codesquad.domain.UserRepository;
+import codesquad.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,11 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import javax.servlet.http.HttpSession;
-import javax.transaction.Transactional;
 
 @Slf4j
 @Controller
 public class UserController {
+    @Autowired
+    private UserService userService;
     @Autowired
     private UserRepository userRepository;
 
@@ -41,18 +43,20 @@ public class UserController {
     }
 
     @GetMapping("/users/{id}/form")
-    public String update (@PathVariable Long id,
-                        Model model) {
+    public String update(@PathVariable Long id,
+                         Model model) {
         model.addAttribute("user", userRepository.findById(id).get());
         return "/user/updateForm";
     }
 
-    @Transactional // JPA의 변경감지를 위해 사용
     @PutMapping("/users/{id}/update")
     public String update(@PathVariable Long id,
-                         User user) {
-        User savedUser = userRepository.findById(id).get();
-        savedUser.update(user);
+                         User user, HttpSession session) {
+        User loginUser = (User) session.getAttribute("sessionedUser");
+        if (loginUser == null) {
+            return "/user/login";
+        }
+        userService.update(loginUser, user, id);
         return "redirect:/users";
     }
 
@@ -66,6 +70,16 @@ public class UserController {
         User user = userRepository.findByUserId(userId);
         user.login(userId, password);
         session.setAttribute("sessionedUser", user);
+        return "redirect:/";
+    }
+
+    @GetMapping("/users/logout")
+    public String logout(HttpSession session) {
+        User loginUser = (User) session.getAttribute("sessionedUser");
+        if (loginUser == null) {
+            return "/user/login";
+        }
+        session.removeAttribute("sessionedUser");
         return "redirect:/";
     }
 }

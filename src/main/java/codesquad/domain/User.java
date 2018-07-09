@@ -9,13 +9,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable=false, length=20)
+    @Column(unique = true, nullable=false, length=30)
     private String userId;
 
     @Column
     private String password;
+
     @Column
     private String name;
+
     @Column
     private String email;
 
@@ -29,11 +31,20 @@ public class User {
         this.email = email;
     }
 
-    public void update(User user) {
-        if(!user.matchPassword(password))
+    public void update(User loginUser, User user) {
+        if(!loginUser.matchUserId(userId)) {
+            throw new IllegalArgumentException("You can't edit your information because your id do not match.");
+        }
+
+        if(!user.matchPassword(password)) {
             throw new IllegalArgumentException("You can't edit your information because your passwords do not match.");
+        }
         this.name = user.getName();
         this.email = user.getEmail();
+    }
+
+    boolean matchUserId(String userId) {
+        return this.userId.equals(userId);
     }
 
     private boolean matchPassword(String password) {
