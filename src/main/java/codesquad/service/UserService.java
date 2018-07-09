@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -16,5 +17,21 @@ public class UserService {
     public void update(User loginUser, User user, Long id) {
         User savedUser = userRepository.findById(id).get();
         savedUser.update(loginUser, user);
+    }
+
+    public void create(User user) {
+        userRepository.save(user);
+    }
+
+    public Iterable<User> getUsers() {
+        return userRepository.findAll();
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).get();
+    }
+
+    public User getUserByUserId(String userId) {
+        return userRepository.findByUserId(userId);
     }
 }

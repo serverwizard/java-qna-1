@@ -1,7 +1,6 @@
 package codesquad.web;
 
 import codesquad.domain.Question;
-import codesquad.domain.QuestionRepository;
 import codesquad.domain.User;
 import codesquad.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,47 +11,47 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 
 @Controller
+@RequestMapping("/questions")
 public class QuestionController {
+    public static final String SESSIONED_USER = "sessionedUser";
     @Autowired
     private QuestionService questionService;
-    @Autowired
-    private QuestionRepository questionRepository;
 
-    @PostMapping("/questions")
+    @PostMapping("")
     public String create(Question question, HttpSession session) {
-        User loginUser = (User) session.getAttribute("sessionedUser");
+        User loginUser = (User) session.getAttribute(SESSIONED_USER);
         if (loginUser == null) {
             return "/user/login";
         }
         question.create(loginUser);
-        questionRepository.save(question);
+        questionService.create(question);
         return "redirect:/";
     }
 
-    @GetMapping("/questions/{id}")
+    @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        model.addAttribute("question", questionRepository.findById(id).get());
+        model.addAttribute("question", questionService.getQuestionById(id));
         return "/qna/show";
     }
 
-    @GetMapping("/questions/{id}/form")
+    @GetMapping("/{id}/form")
     public String update(@PathVariable Long id,
                          Model model) {
-        model.addAttribute("question", questionRepository.findById(id).get());
+        model.addAttribute("question", questionService.getQuestionById(id));
         return "/qna/updateForm";
     }
 
 
-    @PutMapping("/questions/{id}")
+    @PutMapping("/{id}")
     public String update(@PathVariable Long id, Question updatedQuestion, HttpSession session) {
-        User loginUser = (User) session.getAttribute("sessionedUser");
+        User loginUser = (User) session.getAttribute(SESSIONED_USER);
         questionService.update(loginUser, updatedQuestion, id);
         return "redirect:/";
     }
 
-    @DeleteMapping("/questions/{id}")
+    @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id, HttpSession session) {
-        User loginUser = (User) session.getAttribute("sessionedUser");
+        User loginUser = (User) session.getAttribute(SESSIONED_USER);
         if (loginUser == null) {
             return "/user/login";
         }

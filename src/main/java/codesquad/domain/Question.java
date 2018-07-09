@@ -20,7 +20,8 @@ public class Question {
 
     @Column
     private String title;
-    @Column
+
+    @Lob
     private String contents;
     @Column
     private String enrollTime;
@@ -32,7 +33,8 @@ public class Question {
     public Question() {
     }
 
-    public Question(String title, String contents) {
+    public Question(User writer, String title, String contents) {
+        this.writer = writer;
         this.title = title;
         this.contents = contents;
         this.enrollTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -45,7 +47,7 @@ public class Question {
     }
 
     public void update(User loginUser, Question updatedQuestion) {
-        if (loginUser == null || !loginUser.matchUserId(loginUser.getUserId())) {
+        if (loginUser == null || !loginUser.matchUserId(writer.getUserId())) {
             throw new IllegalArgumentException("Other people's posts can not be edited.");
         }
         this.title = updatedQuestion.getTitle();
@@ -53,7 +55,7 @@ public class Question {
     }
 
     public void delete(User loginUser) {
-        if (loginUser == null || !loginUser.matchUserId(loginUser.getUserId())) {
+        if (loginUser == null || !loginUser.matchUserId(writer.getUserId())) {
             throw new UnAuthorizedException();
         }
         isDeleted = true;

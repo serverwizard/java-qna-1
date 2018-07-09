@@ -24,4 +24,16 @@ public class QuestionService {
         Question question = questionRepository.findById(id).get();
         question.delete(loginUser);
     }
+
+    public void create(Question question) {
+        questionRepository.save(question);
+    }
+
+    public Iterable<Question> getQuestions() {
+        return questionRepository.findAll();
+    }
+
+    public Question getQuestionById(Long id) {
+        return questionRepository.findById(id).get();
+    }
 }
