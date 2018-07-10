@@ -2,6 +2,7 @@ package codesquad.web;
 
 import codesquad.domain.User;
 import codesquad.service.UserService;
+import codesquad.util.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,7 +15,7 @@ import javax.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/users")
 public class UserController {
-    public static final String SESSIONED_USER = "sessionedUser";
+    private static final String SESSIONED_USER = "sessionedUser";
     @Autowired
     private UserService userService;
 
@@ -41,7 +42,7 @@ public class UserController {
 
     @GetMapping("/{id}/form")
     public String update(@PathVariable Long id,
-                         Model model) {
+                         Model model, HttpSession session) {
         model.addAttribute("user", userService.getUserById(id));
         return "/user/updateForm";
     }
@@ -49,7 +50,7 @@ public class UserController {
     @PutMapping("/{id}/update")
     public String update(@PathVariable Long id,
                          User user, HttpSession session) {
-        User loginUser = (User) session.getAttribute(SESSIONED_USER);
+        User loginUser = (User) SessionUtils.getSessionedUser(session);
         if (loginUser == null) {
             return "/user/login";
         }
@@ -73,7 +74,7 @@ public class UserController {
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        User loginUser = (User) session.getAttribute(SESSIONED_USER);
+        User loginUser = (User) SessionUtils.getSessionedUser(session);
         if (loginUser == null) {
             return "/user/login";
         }

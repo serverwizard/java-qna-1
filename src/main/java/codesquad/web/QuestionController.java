@@ -3,6 +3,8 @@ package codesquad.web;
 import codesquad.domain.Question;
 import codesquad.domain.User;
 import codesquad.service.QuestionService;
+import codesquad.util.SessionUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,27 +12,27 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
+@Slf4j
 @Controller
 @RequestMapping("/questions")
 public class QuestionController {
-    public static final String SESSIONED_USER = "sessionedUser";
     @Autowired
     private QuestionService questionService;
 
     @PostMapping("")
     public String create(Question question, HttpSession session) {
-        User loginUser = (User) session.getAttribute(SESSIONED_USER);
+        User loginUser = (User) SessionUtils.getSessionedUser(session);
         if (loginUser == null) {
             return "/user/login";
         }
-        question.create(loginUser);
-        questionService.create(question);
+        questionService.create(question, loginUser);
         return "redirect:/";
     }
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         model.addAttribute("question", questionService.getQuestionById(id));
+        log.info("question : {}", questionService.getQuestionById(id));
         return "/qna/show";
     }
 
@@ -44,14 +46,14 @@ public class QuestionController {
 
     @PutMapping("/{id}")
     public String update(@PathVariable Long id, Question updatedQuestion, HttpSession session) {
-        User loginUser = (User) session.getAttribute(SESSIONED_USER);
+        User loginUser = (User) SessionUtils.getSessionedUser(session);
         questionService.update(loginUser, updatedQuestion, id);
         return "redirect:/";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id, HttpSession session) {
-        User loginUser = (User) session.getAttribute(SESSIONED_USER);
+        User loginUser = (User) SessionUtils.getSessionedUser(session);
         if (loginUser == null) {
             return "/user/login";
         }

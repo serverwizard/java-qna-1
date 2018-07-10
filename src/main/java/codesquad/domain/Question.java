@@ -6,6 +6,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Entity
 @Where(clause = "deleted != 'true'") // soft delete
@@ -28,6 +29,9 @@ public class Question {
 
     @Column(name = "deleted")
     private Boolean isDeleted;
+
+    @OneToMany(mappedBy = "question")
+    private List<Answer> answers;
 
     // 디폴트 생성자 필수
     public Question() {
@@ -52,6 +56,10 @@ public class Question {
         }
         this.title = updatedQuestion.getTitle();
         this.contents = updatedQuestion.getContents();
+    }
+
+    public void createAnswer(Answer newAnswer) {
+        this.answers.add(newAnswer);
     }
 
     public void delete(User loginUser) {
@@ -107,5 +115,13 @@ public class Question {
 
     public void setDeleted(Boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public List<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<Answer> answers) {
+        this.answers = answers;
     }
 }
