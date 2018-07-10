@@ -23,25 +23,25 @@ public class QuestionTest {
     }
 
     @Test
-    public void 업데이트_아이디일치() {
+    public void 업데이트_아이디일치함() {
         savedQuestion.update(javajigiUser, updatedQuestion);
         assertThat(savedQuestion.getTitle()).isEqualTo("title2");
         assertThat(savedQuestion.getContents()).isEqualTo("Content2");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void 업데이트_아이디일치하지_않음() {
+    public void 업데이트_아이디일치하지않음() {
         savedQuestion.update(sanjigiUser, updatedQuestion);
     }
 
     @Test
-    public void 삭제_아이디일치() {
+    public void 삭제_아이디일치함() {
         savedQuestion.delete(javajigiUser);
         assertThat(savedQuestion.getDeleted()).isEqualTo(true);
     }
 
     @Test(expected = UnAuthorizedException.class)
-    public void 삭제_아이디일치하지_않음() {
+    public void 삭제_아이디일치하지않음() {
         savedQuestion.delete(sanjigiUser);
     }
 }
