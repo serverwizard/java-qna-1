@@ -69,6 +69,10 @@ public class Question {
         isDeleted = true;
     }
 
+    public boolean isMatchByUser(User loginUser) {
+        return (loginUser != null && loginUser.matchUserId(this.writer.getUserId()));
+    }
+
     public Long getId() {
         return id;
     }

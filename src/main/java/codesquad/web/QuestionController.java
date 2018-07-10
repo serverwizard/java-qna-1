@@ -38,11 +38,17 @@ public class QuestionController {
 
     @GetMapping("/{id}/form")
     public String update(@PathVariable Long id,
-                         Model model) {
+                         Model model, HttpSession session) {
+        User loginUser = (User) SessionUtils.getSessionedUser(session);
+        Question savedQuestion = questionService.getQuestionById(id);
+
+        if(!savedQuestion.isMatchByUser(loginUser)) {
+            throw new IllegalArgumentException("Other people's posts can not be edited.");
+        }
+
         model.addAttribute("question", questionService.getQuestionById(id));
         return "/qna/updateForm";
     }
-
 
     @PutMapping("/{id}")
     public String update(@PathVariable Long id, Question updatedQuestion, HttpSession session) {
