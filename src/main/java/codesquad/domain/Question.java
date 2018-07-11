@@ -1,14 +1,16 @@
 package codesquad.domain;
 
 import codesquad.exception.UnAuthorizedException;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Entity
 @Where(clause = "deleted != 'true'") // soft delete
 public class Question {
@@ -32,7 +34,7 @@ public class Question {
     private boolean isDeleted;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.PERSIST)
-    private List<Answer> answers;
+    private List<Answer> answers = new ArrayList<>();
 
     // 디폴트 생성자 필수
     public Question() {
@@ -69,23 +71,13 @@ public class Question {
 
     public void delete(User loginUser) {
         if (loginUser == null || !loginUser.matchUserId(writer.getUserId())) {
-            throw new IllegalArgumentException("Other people's posts can not be deleted.");
-        }
-        if (!this.answers.isEmpty() && !matchAnswerWriter()) {
-            throw new IllegalArgumentException("It is possible to delete the questioner and all the users of the reply in the same case.");
+            throw new UnAuthorizedException();
         }
 
         for (Answer answer : answers) {
             deleteAnswer(loginUser, answer);
         }
         isDeleted = true;
-    }
-
-    private boolean matchAnswerWriter() {
-        return answers.stream()
-                .filter(a -> !a.matchQuestionWriter(writer))
-                .collect(Collectors.toList())
-                .isEmpty();
     }
 
     public boolean isMatchByUserId(User loginUser) {

@@ -33,6 +33,13 @@ public class Answer {
     public Answer() {
     }
 
+    public Answer(User loginUser, Question question) {
+        this.answerWriter = loginUser;
+        this.question = question;
+        enrollTime= LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+
     public void create(User loginUser, Question question) {
         this.answerWriter = loginUser;
         this.question = question;
@@ -44,10 +51,6 @@ public class Answer {
             throw new IllegalArgumentException("Other people's reply can not be deleted.");
         }
         isDeleted = true;
-    }
-
-    public boolean matchQuestionWriter(User questionWriter) {
-        return questionWriter.matchUserId(answerWriter.getUserId());
     }
 
     public Long getId() {

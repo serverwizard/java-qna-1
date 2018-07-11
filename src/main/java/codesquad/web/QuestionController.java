@@ -19,12 +19,18 @@ public class QuestionController {
     @Autowired
     private QuestionService questionService;
 
+    @GetMapping("/form")
+    public String form(HttpSession session) {
+        User loginUser = SessionUtils.getSessionedUser(session);
+        if(loginUser == null) {
+            return "/user/login";
+        }
+        return "/qna/form";
+    }
+
     @PostMapping("")
     public String create(Question question, HttpSession session) {
         User loginUser = SessionUtils.getSessionedUser(session);
-        if (loginUser == null) {
-            return "/user/login";
-        }
         questionService.create(question, loginUser);
         return "redirect:/";
     }
@@ -60,9 +66,6 @@ public class QuestionController {
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id, HttpSession session) {
         User loginUser = SessionUtils.getSessionedUser(session);
-        if (loginUser == null) {
-            return "/user/login";
-        }
         questionService.delete(loginUser, id);
         return "redirect:/";
     }
