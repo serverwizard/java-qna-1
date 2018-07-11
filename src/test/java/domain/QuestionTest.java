@@ -31,6 +31,7 @@ public class QuestionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void 업데이트_아이디일치하지않음() {
+
         savedQuestion.update(sanjigiUser, updatedQuestion);
     }
 

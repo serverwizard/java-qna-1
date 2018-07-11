@@ -21,7 +21,7 @@ public class QuestionController {
 
     @PostMapping("")
     public String create(Question question, HttpSession session) {
-        User loginUser = (User) SessionUtils.getSessionedUser(session);
+        User loginUser = SessionUtils.getSessionedUser(session);
         if (loginUser == null) {
             return "/user/login";
         }
@@ -39,10 +39,10 @@ public class QuestionController {
     @GetMapping("/{id}/form")
     public String update(@PathVariable Long id,
                          Model model, HttpSession session) {
-        User loginUser = (User) SessionUtils.getSessionedUser(session);
+        User loginUser = SessionUtils.getSessionedUser(session);
         Question savedQuestion = questionService.getQuestionById(id);
 
-        if(!savedQuestion.isMatchByUser(loginUser)) {
+        if(!savedQuestion.isMatchByUserId(loginUser)) {
             throw new IllegalArgumentException("Other people's posts can not be edited.");
         }
 
@@ -52,14 +52,14 @@ public class QuestionController {
 
     @PutMapping("/{id}")
     public String update(@PathVariable Long id, Question updatedQuestion, HttpSession session) {
-        User loginUser = (User) SessionUtils.getSessionedUser(session);
+        User loginUser = SessionUtils.getSessionedUser(session);
         questionService.update(loginUser, updatedQuestion, id);
         return "redirect:/";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable Long id, HttpSession session) {
-        User loginUser = (User) SessionUtils.getSessionedUser(session);
+        User loginUser = SessionUtils.getSessionedUser(session);
         if (loginUser == null) {
             return "/user/login";
         }

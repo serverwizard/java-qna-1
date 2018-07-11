@@ -59,6 +59,7 @@ public class Question {
     }
 
     public void createAnswer(Answer newAnswer) {
+        newAnswer.setQuestion(this);
         this.answers.add(newAnswer);
     }
 
@@ -69,7 +70,7 @@ public class Question {
         isDeleted = true;
     }
 
-    public boolean isMatchByUser(User loginUser) {
+    public boolean isMatchByUserId(User loginUser) {
         return (loginUser != null && loginUser.matchUserId(this.writer.getUserId()));
     }
 
@@ -125,7 +126,4 @@ public class Question {
         return answers;
     }
 
-    public void setAnswers(List<Answer> answers) {
-        this.answers = answers;
-    }
 }

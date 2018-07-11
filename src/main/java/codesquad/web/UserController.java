@@ -50,7 +50,7 @@ public class UserController {
     @PutMapping("/{id}/update")
     public String update(@PathVariable Long id,
                          User user, HttpSession session) {
-        User loginUser = (User) SessionUtils.getSessionedUser(session);
+        User loginUser = SessionUtils.getSessionedUser(session);
         if (loginUser == null) {
             return "/user/login";
         }
@@ -68,13 +68,12 @@ public class UserController {
         User user = userService.getUserByUserId(userId);
         user.login(userId, password);
         session.setAttribute(SESSIONED_USER, user);
-
         return "redirect:/";
     }
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        User loginUser = (User) SessionUtils.getSessionedUser(session);
+        User loginUser = SessionUtils.getSessionedUser(session);
         if (loginUser == null) {
             return "/user/login";
         }
