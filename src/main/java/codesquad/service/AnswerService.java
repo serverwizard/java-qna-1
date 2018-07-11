@@ -14,16 +14,15 @@ public class AnswerService {
     private AnswerRepository answerRepository;
 
     @Transactional
-    public void create(Long questionId, Answer newAnswer) {
+    public void create(User loginUser, Long questionId, Answer newAnswer) {
         Question savedQuestion = questionRepository.findById(questionId).get();
-        savedQuestion.createAnswer(newAnswer);
-//        answerRepository.save(newAnswer);
+        savedQuestion.createAnswer(loginUser, newAnswer);
     }
 
     @Transactional
-    public void delete(User loginUser, Long id) {
+    public void delete(User loginUser, Long questionId, Long id) {
+        Question savedQuestion = questionRepository.findById(questionId).get();
         Answer savedAnswer = answerRepository.findById(id).get();
-        savedAnswer.delete(loginUser);
-        answerRepository.delete(savedAnswer);
+        savedQuestion.deleteAnswer(loginUser, savedAnswer);
     }
 }

@@ -4,6 +4,7 @@ import codesquad.domain.Answer;
 import codesquad.domain.User;
 import codesquad.service.AnswerService;
 import codesquad.util.SessionUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
 
+@Slf4j
 @Controller
 @RequestMapping("/questions/{questionId}/answers")
 public class AnswerController {
@@ -25,7 +27,7 @@ public class AnswerController {
         if(loginUser == null)
             throw new IllegalArgumentException();
 
-        answerService.create(questionId, newAnswer);
+        answerService.create(loginUser, questionId, newAnswer);
         return String.format("redirect:/questions/%d", questionId);
     }
 
@@ -35,7 +37,7 @@ public class AnswerController {
         if(loginUser == null)
             throw new IllegalArgumentException("Comments created by others can not be deleted.");
 
-        answerService.delete(loginUser, id);
+        answerService.delete(loginUser, questionId, id);
         return String.format("redirect:/questions/%d", questionId);
     }
 }

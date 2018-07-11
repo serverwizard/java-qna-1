@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Where(clause = "deleted != 'true'") // soft delete
@@ -28,9 +29,9 @@ public class Question {
     private String enrollTime;
 
     @Column(name = "deleted")
-    private Boolean isDeleted;
+    private boolean isDeleted;
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.PERSIST)
     private List<Answer> answers;
 
     // 디폴트 생성자 필수
@@ -47,7 +48,6 @@ public class Question {
     public void create(User loginUser) {
         this.writer = loginUser;
         this.enrollTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        this.isDeleted = false;
     }
 
     public void update(User loginUser, Question updatedQuestion) {
@@ -58,16 +58,34 @@ public class Question {
         this.contents = updatedQuestion.getContents();
     }
 
-    public void createAnswer(Answer newAnswer) {
-        newAnswer.setQuestion(this);
+    public void createAnswer(User loginUser, Answer newAnswer) {
+        newAnswer.create(loginUser, this);
         this.answers.add(newAnswer);
+    }
+
+    public void deleteAnswer(User loginUser, Answer answer) {
+        answer.delete(loginUser);
     }
 
     public void delete(User loginUser) {
         if (loginUser == null || !loginUser.matchUserId(writer.getUserId())) {
-            throw new UnAuthorizedException();
+            throw new IllegalArgumentException("Other people's posts can not be deleted.");
+        }
+        if (!this.answers.isEmpty() && !matchAnswerWriter()) {
+            throw new IllegalArgumentException("It is possible to delete the questioner and all the users of the reply in the same case.");
+        }
+
+        for (Answer answer : answers) {
+            deleteAnswer(loginUser, answer);
         }
         isDeleted = true;
+    }
+
+    private boolean matchAnswerWriter() {
+        return answers.stream()
+                .filter(a -> !a.matchQuestionWriter(writer))
+                .collect(Collectors.toList())
+                .isEmpty();
     }
 
     public boolean isMatchByUserId(User loginUser) {
@@ -125,5 +143,4 @@ public class Question {
     public List<Answer> getAnswers() {
         return answers;
     }
-
 }
