@@ -1,0 +1,1 @@
+insert into question (title, contents) values ('테스트', '테스트')
